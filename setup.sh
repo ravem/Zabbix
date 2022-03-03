@@ -97,6 +97,8 @@ log "********** Restarting nginx and starting Zabbix Server... ********** "
 systemctl restart zabbix-server zabbix-agent nginx php7.4-fpm >> $logfile 2>&1
 systemctl enable zabbix-server zabbix-agent nginx php7.4-fpm >> $logfile 2>&1
 
-
+#END 
+ZABBIX_IP=$(ip addr show | grep -v "127.0.0.1/8" | grep -o 'inet [0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' | grep -o [0-9].*)
+echo You can connect to http:\\$ZABBIX_IP to access Zabbix
 
 
