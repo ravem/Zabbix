@@ -26,21 +26,19 @@ log(){
 #install ssh server
 echo ""
 log "Install ssh "
-echo ""
 apt -y install openssh-server >> $logfile 2>&1
 
 echo ""
 log "Check ssh service status"
-echo ""
-
 systemctl status sshd >> $logfile 2>&1
 
+echo ""
 log "Enable ssh service startup"
 systemctl enable ssh >> $logfile 2>&1
 
 echo ""
 log "Disable root login via ssh"
-echo ""
+
 echo "sed '0,/^.*PermitRootLogin.*$/s//PermitRootLogin no/' /etc/ssh/sshd_config" >> $logfile 2>&1
 
 #VARIABLES FOR ZABBIX INSTALL
@@ -62,7 +60,6 @@ monitorDBpass="PASSWORD"
 #Install Zabbix from repo
 echo ""
 log "Install Zabbix from repo"
-echo ""
 wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-1+debian11_all.deb >> $logfile 2>&1
 dpkg -i zabbix-release_6.0-1+debian11_all.deb >> $logfile 2>&1
 apt -y update >> $logfile 2>&1
@@ -71,7 +68,6 @@ apt -y install zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-
 # Install database
 echo ""
 log "Install database"
-echo ""
 apt -y install mariadb-server >> $logfile 2>&1
 systemctl start mariadb >> $logfile 2>&1
 systemctl enable mariadb >> $logfile 2>&1
@@ -113,4 +109,5 @@ systemctl enable zabbix-server zabbix-agent nginx php7.4-fpm >> $logfile 2>&1
 ZABBIX_IP=$(ip addr show | grep -v "127.0.0.1/8" | grep -o 'inet [0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' | grep -o [0-9].*)
 echo ""
 echo ""
-echo "$(tput setaf 1)You can connect to $ZABBIX_IP to access Zabbix (tput sgr 0)"
+echo "$(tput bold)$(tput setaf 1)You can connect to $ZABBIX_IP to access Zabbix (tput sgr0)"
+echo ""
