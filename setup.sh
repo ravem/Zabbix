@@ -58,20 +58,28 @@ monitorDBpass="PASSWORD"
 #LET'S GO WITH ZABBIX
 #Install Zabbix from repo
 echo ""
-log "Install Zabbix from repo"
+log "Download Zabbix from repo"
 wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-1+debian11_all.deb >> $logfile 2>&1
 dpkg -i zabbix-release_6.0-1+debian11_all.deb >> $logfile 2>&1
+
+echo ""
+log "Update system"
 apt -y update >> $logfile 2>&1
+
+echo ""
+log "Install Zabbix"
 apt -y install zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent >> $logfile 2>&1
 
 # Install database
 echo ""
-log "Install database"
+log "Install database server"
 apt -y install mariadb-server >> $logfile 2>&1
 systemctl start mariadb >> $logfile 2>&1
 systemctl enable mariadb >> $logfile 2>&1
 
 # Configure SQL installation
+echo ""
+log "Configure SQL installation"
 mysql --user=root <<_EOF_
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${rootDBpass}';
 DELETE FROM mysql.user WHERE User='';
@@ -93,7 +101,7 @@ zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -p$z
 
 #Start Zabbix server and agent processes and make it start at system boot
 echo ""
-log "Removing default website"
+log "Removing nginx default website"
 rm /etc/nginx/sites-enabled/default
 
 echo ""
@@ -103,10 +111,11 @@ systemctl restart zabbix-server zabbix-agent nginx php7.4-fpm >> $logfile 2>&1
 systemctl enable zabbix-server zabbix-agent nginx php7.4-fpm >> $logfile 2>&1
 
 #END 
+#Assuming you have only one network interface, beyond the loopback one
 ZABBIX_IP=$(ip addr show | grep -v "127.0.0.1/8" | grep -o 'inet [0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' | grep -o [0-9].*)
 echo ""
 echo ""
-echo "$(tput bold)$(tput setaf 1)You can connect to $ZABBIX_IP to access Zabbix"
+echo "$(tput bold)$(tput setaf 1)You can connect to http:\\\\$ZABBIX_IP to access Zabbix"
 tput sgr0
 echo ""
 
