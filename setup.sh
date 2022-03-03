@@ -16,16 +16,16 @@ log(){
 
 #Add zabbix local user
 #modify the password according to your needs
-log "********** Add local user ********** "
-username=zabbix
-password=PASSWORD
+#log "********** Add local user ********** "
+#username=zabbix
+#password=PASSWORD
 
-adduser --gecos "" --disabled-password $username
-chpasswd <<<"$username:$password"
+#adduser --gecos "" --disabled-password $username
+#chpasswd <<<"$username:$password"
 
 #install ssh server
 log "********** Install ssh ********** "
-apt install openssh-server >> $logfile 2>&1
+apt -y install openssh-server >> $logfile 2>&1
 
 log "********** Check ssh service status"
 systemctl status sshd >> $logfile 2>&1
@@ -56,8 +56,8 @@ monitorDBpass="PASSWORD"
 log "********** Install Zabbix from repo ********** "
 wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-1+debian11_all.deb >> $logfile 2>&1
 dpkg -i zabbix-release_6.0-1+debian11_all.deb >> $logfile 2>&1
-apt update >> $logfile 2>&1
-apt install zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent >> $logfile 2>&1
+apt -y update >> $logfile 2>&1
+apt -y install zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent >> $logfile 2>&1
 
 # Install database
 log "********** Install database ********** "
