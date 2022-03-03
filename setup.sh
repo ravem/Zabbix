@@ -24,22 +24,23 @@ log(){
 #chpasswd <<<"$username:$password"
 
 #install ssh server
-log ""
+echo ""
 log "Install ssh "
-log ""
+echo ""
 apt -y install openssh-server >> $logfile 2>&1
 
-log ""
+echo ""
 log "Check ssh service status"
-log ""
+echo ""
+
 systemctl status sshd >> $logfile 2>&1
 
 log "Enable ssh service startup"
 systemctl enable ssh >> $logfile 2>&1
 
-log ""
+echo ""
 log "Disable root login via ssh"
-log ""
+echo ""
 echo "sed '0,/^.*PermitRootLogin.*$/s//PermitRootLogin no/' /etc/ssh/sshd_config" >> $logfile 2>&1
 
 #VARIABLES FOR ZABBIX INSTALL
@@ -59,18 +60,18 @@ monitorDBpass="PASSWORD"
 
 #LET'S GO WITH ZABBIX
 #Install Zabbix from repo
-log ""
+echo ""
 log "Install Zabbix from repo"
-log ""
+echo ""
 wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-1+debian11_all.deb >> $logfile 2>&1
 dpkg -i zabbix-release_6.0-1+debian11_all.deb >> $logfile 2>&1
 apt -y update >> $logfile 2>&1
 apt -y install zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent >> $logfile 2>&1
 
 # Install database
-log ""
+echo ""
 log "Install database"
-log ""
+echo ""
 apt -y install mariadb-server >> $logfile 2>&1
 systemctl start mariadb >> $logfile 2>&1
 systemctl enable mariadb >> $logfile 2>&1
@@ -91,25 +92,25 @@ FLUSH PRIVILEGES;
 _EOF_
 
 #Import database schema for Zabbix server
-log ""
+echo ""
 log "Import database schema for Zabbix server"
-log ""
+echo ""
 zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -p$zabbixDBpass zabbix >> $logfile 2>&1
 
 #Start Zabbix server and agent processes and make it start at system boot
-log ""
+echo ""
 log "Removing default website"
-log ""
+echo ""
 rm /etc/nginx/sites-enabled/default
 
-log ""
+echo ""
 log "Restarting nginx and starting Zabbix Server..."
-log ""
+echo ""
 systemctl restart zabbix-server zabbix-agent nginx php7.4-fpm >> $logfile 2>&1
 systemctl enable zabbix-server zabbix-agent nginx php7.4-fpm >> $logfile 2>&1
 
 #END 
 ZABBIX_IP=$(ip addr show | grep -v "127.0.0.1/8" | grep -o 'inet [0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' | grep -o [0-9].*)
-echo .
-echo .
-echo $(tput setaf 1)You can connect to $ZABBIX_IP to access Zabbix $
+echo ""
+echo ""
+echo "$(tput setaf 1)You can connect to $ZABBIX_IP to access Zabbix (tput sgr 0)"
