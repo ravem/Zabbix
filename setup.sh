@@ -64,7 +64,7 @@ systemctl start mariadb >> $logfile 2>&1
 systemctl enable mariadb >> $logfile 2>&1
 
 # Configure SQL installation
-sudo -E mysql --user=root <<_EOF_
+mysql --user=root <<_EOF_
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${rootDBpass}';
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
@@ -81,11 +81,11 @@ _EOF_
 
 #Import database schema for Zabbix server
 log "Import database schema for Zabbix server"
-zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql -u zabbix -p'zabbixDBpass' zabbix >> $logfile 2>&1
+zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -p'zabbixDBpass' zabbix >> $logfile 2>&1
 
 #Configure the database for Zabbix server
 log "Configure the database for Zabbix server"
-sudo -E sed -i "s/# DBPassword=/DBPassword=$zabbixDBpass/g" "$zabbixconf" >> $logfile 2>&1
+sed -i "s/# DBPassword=/DBPassword=$zabbixDBpass/g" "$zabbixconf" >> $logfile 2>&1
 
 
 #Start Zabbix server and agent processes and make it start at system boot
