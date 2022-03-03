@@ -38,7 +38,6 @@ systemctl enable ssh >> $logfile 2>&1
 
 echo ""
 log "Disable root login via ssh"
-
 echo "sed '0,/^.*PermitRootLogin.*$/s//PermitRootLogin no/' /etc/ssh/sshd_config" >> $logfile 2>&1
 
 #VARIABLES FOR ZABBIX INSTALL
@@ -90,13 +89,11 @@ _EOF_
 #Import database schema for Zabbix server
 echo ""
 log "Import database schema for Zabbix server"
-echo ""
 zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -p$zabbixDBpass zabbix >> $logfile 2>&1
 
 #Start Zabbix server and agent processes and make it start at system boot
 echo ""
 log "Removing default website"
-echo ""
 rm /etc/nginx/sites-enabled/default
 
 echo ""
