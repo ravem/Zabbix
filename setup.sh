@@ -16,7 +16,7 @@ log(){
 
 #Add zabbix local user
 #modify the password according to your needs
-#log "********** Add local user ********** "
+#log "Add local user"
 #username=zabbix
 #password=PASSWORD
 
@@ -24,16 +24,22 @@ log(){
 #chpasswd <<<"$username:$password"
 
 #install ssh server
-log "********** Install ssh ********** "
+log ""
+log "Install ssh "
+log ""
 apt -y install openssh-server >> $logfile 2>&1
 
-log "********** Check ssh service status"
+log ""
+log "Check ssh service status"
+log ""
 systemctl status sshd >> $logfile 2>&1
 
-log "********** Enable ssh service startup ********** "
+log "Enable ssh service startup"
 systemctl enable ssh >> $logfile 2>&1
 
+log ""
 log "Disable root login via ssh"
+log ""
 echo "sed '0,/^.*PermitRootLogin.*$/s//PermitRootLogin no/' /etc/ssh/sshd_config" >> $logfile 2>&1
 
 #VARIABLES FOR ZABBIX INSTALL
@@ -53,14 +59,18 @@ monitorDBpass="PASSWORD"
 
 #LET'S GO WITH ZABBIX
 #Install Zabbix from repo
-log "********** Install Zabbix from repo ********** "
+log ""
+log "Install Zabbix from repo"
+log ""
 wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-1+debian11_all.deb >> $logfile 2>&1
 dpkg -i zabbix-release_6.0-1+debian11_all.deb >> $logfile 2>&1
 apt -y update >> $logfile 2>&1
 apt -y install zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent >> $logfile 2>&1
 
 # Install database
-log "********** Install database ********** "
+log ""
+log "Install database"
+log ""
 apt -y install mariadb-server >> $logfile 2>&1
 systemctl start mariadb >> $logfile 2>&1
 systemctl enable mariadb >> $logfile 2>&1
@@ -81,24 +91,25 @@ FLUSH PRIVILEGES;
 _EOF_
 
 #Import database schema for Zabbix server
-log "********** Import database schema for Zabbix server ********** "
-zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -p'zabbixDBpass' zabbix >> $logfile 2>&1
-
-#Configure the database for Zabbix server
-log "********** Configure the database password for Zabbix server ********** "
-sed -i "s/# DBPassword=/DBPassword=$zabbixDBpass/g" "$zabbixconf" >> $logfile 2>&1
-
+log ""
+log "Import database schema for Zabbix server"
+log ""
+zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -p$zabbixDBpass zabbix >> $logfile 2>&1
 
 #Start Zabbix server and agent processes and make it start at system boot
-log "********** Removing default website ********** "
+log ""
+log "Removing default website"
+log ""
 rm /etc/nginx/sites-enabled/default
 
-log "********** Restarting nginx and starting Zabbix Server... ********** "
+log ""
+log "Restarting nginx and starting Zabbix Server..."
+log ""
 systemctl restart zabbix-server zabbix-agent nginx php7.4-fpm >> $logfile 2>&1
 systemctl enable zabbix-server zabbix-agent nginx php7.4-fpm >> $logfile 2>&1
 
 #END 
 ZABBIX_IP=$(ip addr show | grep -v "127.0.0.1/8" | grep -o 'inet [0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' | grep -o [0-9].*)
-echo You can connect to $ZABBIX_IP to access Zabbix
-
-
+echo .
+echo .
+echo $(tput setaf 1)You can connect to $ZABBIX_IP to access Zabbix $
