@@ -59,7 +59,7 @@ monitorDBpass="PASSWORD"
 #Install Zabbix from repo
 echo ""
 log "Download Zabbix from repo"
-wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-1+debian11_all.deb >> $logfile 2>&1
+wget https://repo.zabbix.com/zabbix/6.1/debian/pool/main/z/zabbix-release/zabbix-release_6.1-1+debian10_all.deb >> $logfile 2>&1
 dpkg -i zabbix-release_6.0-1+debian11_all.deb >> $logfile 2>&1
 
 echo ""
